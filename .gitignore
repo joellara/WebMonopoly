@@ -58,6 +58,6 @@ typings/
 .env
 
 # Certs
-.pem
-.crt
-.key
+*.pem
+*.crt
+*.key

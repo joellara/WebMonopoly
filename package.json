@@ -1,0 +1,30 @@
+{
+  "name": "webmonopoly",
+  "version": "1.0.0",
+  "description": "Web Monopoly for Web Dev Class",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joellara/WebMonopoly.git"
+  },
+  "keywords": [
+    "Monopoly"
+  ],
+  "author": "Esteban Gil & Joel Lara",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joellara/WebMonopoly/issues"
+  },
+  "homepage": "https://github.com/joellara/WebMonopoly#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "ejs": "^2.5.6",
+    "express": "^4.15.2",
+    "mongoose": "^4.9.5",
+    "multer": "^1.3.0",
+    "sqlite3": "^3.1.8"
+  }
+}

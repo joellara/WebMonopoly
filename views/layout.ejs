@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web Monopoly by Esteban & Joel</title>
+    <link href="/bower/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">
+                Web Monopoly
+            </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/game/">¡Jugar!</a>
+                </li>
+                <li>
+                    <a href="/instructions/">Instrucciones</a>
+                </li>
+                <li>
+                    <a href="/users/">Usuarios</a>
+                </li>
+                <li>
+                    <a href="/about/">Acerca de</a>
+                  </li>
+            </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <% if ( typeof username === 'undefined' || username.id === undefined || username.id === null || username.id === '' ) { %>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Iniciar Sesión/Registrarse <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="/login/">Iniciar Sesión</a></li>
+                      <li><a href="/sign-up/">Registrarse</a></li>
+                    </ul>
+                  </li>
+                <% } else { %>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle text-uppercase" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <%= username.name %> <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="#logout">Salir</a></li>
+                    </ul>
+                  </li>
+                  <% }; %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <%- body %>
+    <script src="/bower/jquery/dist/jquery.min.js"></script>
+    <script src="/bower/bootstrap/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

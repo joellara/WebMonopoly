@@ -59,7 +59,8 @@ app.all('*', ensureSecure);
 
 //routes
 app.use('/',index);
-app.use('/users/',user);
+app.use('/auth/',auth);
+app.use('/user/',user);
 app.use('/game/',game);
 
 //Catch 404

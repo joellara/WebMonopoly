@@ -8,29 +8,36 @@
                 </h1>
             </div>
             <div class="panel-body">
-              <form id="signup-form" action="/auth/signup/" method="post" name="Login_Form" class="login">
-                <div style="margin-top: 20px; margin-bottom: 25px" class="input-group">
-                  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                  <input id="login-username" type="text" class="form-control" name="username" value="" placeholder="Nombre">
-                </div>
+              <form id="signup-form" action="/auth/signup/" method="post" name="signup-form">
+                    <div style="margin-top: 20px; margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input id="signup-name" type="text" class="form-control" name="name" value="" placeholder="Nombre" aria-describedby="helpBlockUsername" required>
+                    </div>
 
-                <div style="margin-top: 20px; margin-bottom: 25px" class="input-group">
-                  <span class="input-group-addon"><i class="glyphicon glyphicon-record"></i></span>
-                  <input id="login-username" type="text" class="form-control" name="username" value="" placeholder="Usuario">
-                </div>
+                    <div class="form-group" id="username-block">
+                        <div style="margin-top: 20px; margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-record"></i></span>
+                            <input id="signup-username" type="text" class="form-control" name="username" value="" placeholder="Usuario" required>
+                        </div>
+                        <span id="helpBlockUsername" class="help-block invisible">
+                            El usuario ya existe.
+                        </span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 35px" id="password-block">
+                        <div style="margin-bottom: 25px" class="input-group">
+                          <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                          <input id="signup-password" type="password" class="form-control" name="password" placeholder="Contraseña" required>
+                        </div>
 
-                <div style="margin-bottom: 25px" class="input-group">
-                  <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                  <input id="login-password" type="password" class="form-control" name="password" placeholder="Contraseña">
-                </div>
-
-                <div style="margin-bottom: 35px" class="input-group">
-                  <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                  <input id="login-password-repeat" type="password" class="form-control" name="password-repeat" placeholder="Contraseña (Nuevamente)">
-                </div>
-
-                <button class="btn btn-lg btn-primary btn-block" style="margin-bottom:40px;" name="Submit" value="Login" type="Submit">Registrarme</button>
-
+                        <div  class="input-group">
+                          <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                          <input id="signup-password-repeat" type="password" class="form-control" name="password-repeat" placeholder="Contraseña (Nuevamente)" required>
+                        </div>
+                        <span id="helpBlockPassword" class="help-block invisible">
+                            Las contraseñas no son las mismas.
+                        </span>
+                    </div>
+                <button class="btn btn-lg btn-primary btn-block" style="margin-bottom:40px;" name="Submit" value="Signup" type="Submit">Registrarme</button>
               </form>
               <p class="text-center"><small>¿Ya tienes cuenta? <a href="/login/">Iniciar Sesión</a></small></p>
             </div>
@@ -38,3 +45,4 @@
         </div>
     </div>
 </div>
+<script src="/js/signupCtrl.js" type="text/javascript" charset="utf-8"></script>

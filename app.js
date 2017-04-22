@@ -1,5 +1,5 @@
 "use strict";
-var express =  require('express');
+var express = require('express');
 var https = require('https');
 var http = require('http');
 var path = require('path');
@@ -11,10 +11,10 @@ var cookieSession = require('cookie-session');
 var exprEJSLay = require('express-ejs-layouts');
 
 //Routes
-var index =  require(path.join(__dirname,'routes/index.js'));
-var user =  require(path.join(__dirname,'routes/users.js'));
-var auth = require(path.join(__dirname,'routes/auth.js'));
-var game = require(path.join(__dirname,'routes/game.js'));
+var index = require(path.join(__dirname, 'routes/index.js'));
+var user = require(path.join(__dirname, 'routes/user.js'));
+var auth = require(path.join(__dirname, 'routes/auth.js'));
+var game = require(path.join(__dirname, 'routes/game.js'));
 
 var app = express();
 
@@ -25,16 +25,16 @@ var options = {
     passphrase: '1a2s3d4f5g6h7j8k9l0'
 };
 
-function ensureSecure(req, res, next){
-  if(req.secure || req.headers["x-forwarded-proto"] === "https"){
-    return next();
-  };
-  // res.redirect('https://' + req.host + req.url); // express 3.x
-  res.redirect('https://' + req.hostname + req.url); // express 4.x
+function ensureSecure(req, res, next) {
+    if (req.secure || req.headers["x-forwarded-proto"] === "https") {
+        return next();
+    };
+    // res.redirect('https://' + req.host + req.url); // express 3.x
+    res.redirect('https://' + req.hostname + req.url); // express 4.x
 }
 
 //EJS Settings
-app.set('views', path.join(__dirname,'views'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 //middleware for layout
@@ -42,26 +42,26 @@ app.use(exprEJSLay);
 
 //cookieSesssion middleware
 app.use(cookieSession({
-  name: 'session',
-  secret: '1a2s3d4f5g6h7j8k9l0',
-  maxAge: 24 * 60 * 60 * 1000
+    name: 'session',
+    secret: '1a2s3d4f5g6h7j8k9l0',
+    maxAge: 24 * 60 * 60 * 1000
 }));
 
 //Other middlewares
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use('/bower',express.static(path.join(__dirname,'bower_components')));
+app.use('/bower', express.static(path.join(__dirname, 'bower_components')));
 
 //check https
 app.all('*', ensureSecure);
 
 //routes
-app.use('/',index);
-app.use('/auth/',auth);
-app.use('/user/',user);
-app.use('/game/',game);
+app.use('/', index);
+app.use('/auth/', auth);
+app.use('/user/', user);
+app.use('/game/', game);
 
 //Catch 404
 app.use(function(req, res, next) {
@@ -70,18 +70,23 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-mongoose.connect('mongodb://localhost/web_monopoly');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/web_monopoly');
 mongoose.connection.on('open', () => {
-  console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB');
+    let httpServ = http.createServer(app).listen(process.env.port ||  80, function() {
+        let port = httpServ.address().port;
+        console.log("Unsecure app now running on port", port);
+    });
+    let httpsServ = https.createServer(options, app).listen(process.env.port ||  443, function() {
+        let port = httpsServ.address().port;
+        console.log("Secure app now running on port", port);
+    });
 });
 mongoose.connection.on('error', err => {
-  console.log('Mongoose Error. ' + err);
+    console.log('Mongoose Error. ' + err);
 });
 
-http.createServer(app).listen(80);
-https.createServer(options, app).listen(443);
-
-process.on('SIGINT', function () {
-  console.log("Terminando el servidor...");
-  process.exit(0);
+process.on('SIGINT', function() {
+    console.log("Terminando el servidor...");
+    process.exit(0);
 });

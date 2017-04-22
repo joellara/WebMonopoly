@@ -4,3 +4,8 @@ body {
 .invisible {
     display: none;
 }
+.glyphicon-big{
+  font-size: 60px ;
+  color: #555 ;
+  margin-bottom: 10px;
+}

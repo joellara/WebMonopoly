@@ -24,14 +24,14 @@ router.post('/login/', function(req, res, next) {
             valid: false,
             message: 'Error interno, intente de nuevo más tarde.'
         });
-        if (user !== undefined && user !== null) {
+        if (typeof user !== undefined && user !== null) {
             let [password,] = getHash(req.body.password.trim(),user.salt);
             User.findOne({username:req.body.username,password:password},(err2,user2)=>{
                 if (err2) res.json({
                     valid: false,
                     message: 'Error interno, intente de nuevo más tarde.'
                 });
-                if (user2 !== undefined && user !== null) {
+                if (typeof user2 !== undefined && user !== null) {
                     req.session.user_id = user._id;
                     req.session.user_name = user.name;
                     req.session.user_username = user.username;
@@ -42,7 +42,8 @@ router.post('/login/', function(req, res, next) {
                         player: {
                             id: user._id,
                             name: user.name
-                        }
+                        },
+                        redirect: req.session.redirect
                     });
                 }else{
                     res.json({
@@ -72,7 +73,7 @@ router.post('/signup/', function(req, res, next) {
             let [password, salt] = getHash(req.body.password.trim());
             var newUser = new User({ name: req.body.name, username: req.body.username, password: password, salt: salt });
             if (newUser !== undefined && newUser !== null) {
-                newUser.save((err, user) => {
+                newUser.save(function(err, user){
                     if (err) res.json({
                         valid: false,
                         message: 'Error interno. Intente de nuevo más tarde.'

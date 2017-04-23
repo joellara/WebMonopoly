@@ -1,3 +1,61 @@
-<div class="container" id="gameBoard">
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <h1><%= title %></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Nuevo juego</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="newGameForm" action="/game/" method="POST">
+                        <div class="form-group">
+                            <label  for="name">Ingresa el nombre del juego para crearlo. </label>
+                            <input name="name" type="text" class="form-control" id="newGameName" placeholder="Nombre del juego">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Juegos pendientes</h3>
+                </div>
+                <ul class="list-group">
+                    <div class="row">
+                        <% for(var i = 0; i < games.length;i++){%>
+                            <div class="col-xs-11">
+                                <a href="/game/<%= games[i]._id%>" target="_blank" class="list-group-item"><%= games[i].name%></a>
+                            </div>
+                            <div class="col-xs-1">
+                                <a target="_blank" class="list-group-item text-center btn btn-danger"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> </a>
+                            </div>
+                        <% }%>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Juegos pasados</h3>
+                </div>
+                <ul class="list-group">
+                    <% for(var i = 0; i < games.length;i++){%>
+                        <a href="/game/<%= games[i]._id%>" target="_blank" class="list-group-item"><%= games[i].name%></a>
+                    <% }%>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
-<script src="/js/gameCtrl.js" type="text/javascript" charset="utf-8" defer></script>
+<script src="/js/gamesCtrl.js" type="text/javascript" charset="utf-8" defer></script>

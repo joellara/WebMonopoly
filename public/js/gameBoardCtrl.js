@@ -252,7 +252,6 @@ function getColCard(card){
     if(card.type === 1){
         htmlBoard+='<p>'+card.name+'</p>';
         htmlBoard+='<p>'+card.price+'</p>';
-        htmlBoard+='<img src="" alt="thing" />'
     }else if(card.type === 2){ //station
         htmlBoard+='<p>'+card.name+'</p>';
         htmlBoard+='<p>'+card.price+'</p>';
@@ -289,7 +288,7 @@ function createBoard(){
     //first row
     let htmlBoard = '<div class="row text-center">';
     for(let i = 0; i < gameBoardSizeCorner; i++){
-        htmlBoard+= '<div class="col-sm-1 '+dataBoard[i].color+'  center-block card" id="'+i+'">';
+        htmlBoard+= '<div class="col-xs-1 '+dataBoard[i].color+'  center-block card" id="'+i+'">';
         htmlBoard+= getColCard(dataBoard[i]);
         htmlBoard+='</div>';
     }
@@ -297,22 +296,22 @@ function createBoard(){
     //intermidiate rows
     for (let i = 40-1; i >= 40-9; i--) {
         htmlBoard += '<div class="row text-center">';
-            htmlBoard+= '<div class="col-sm-1 '+dataBoard[i].color+'  center-block card" id="'+i+'">';
+            htmlBoard+= '<div class="col-xs-1 '+dataBoard[i].color+'  center-block card" id="'+i+'">';
             htmlBoard+= getColCard(dataBoard[i]);
             htmlBoard+= '</div>';
-            htmlBoard+= '<div class="col-sm-9">';
+            htmlBoard+= '<div class="col-xs-9">';
             htmlBoard+= '</div>';
-            htmlBoard+= '<div class="col-sm-1 '+dataBoard[50-i].color+'  center-block card" id="'+(50-i)+'">';
+            htmlBoard+= '<div class="col-xs-1 '+dataBoard[50-i].color+'  center-block card" id="'+(50-i)+'">';
             htmlBoard+= getColCard(dataBoard[50-i]);
             htmlBoard+= '</div>';
-            htmlBoard+= '<div class="col-sm-1">';
+            htmlBoard+= '<div class="col-xs-1">';
             htmlBoard+= '</div>';
         htmlBoard+='</div>';
     }
     //last row
     htmlBoard += '<div class="row text-center">';
     for(let i = 19+gameBoardSizeCorner; i >= 20; i--){
-        htmlBoard+= '<div class="col-sm-1 '+dataBoard[i].color+'  center-block card" id="'+i+'">';
+        htmlBoard+= '<div class="col-xs-1 '+dataBoard[i].color+'  center-block card" id="'+i+'">';
         htmlBoard+= getColCard(dataBoard[i]);
         htmlBoard+='</div>';
     }
@@ -321,5 +320,4 @@ function createBoard(){
 }
 $(document).ready(function(){
     $('#gameBoard').empty().html(createBoard());
-
 });

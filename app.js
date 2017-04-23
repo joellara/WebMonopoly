@@ -65,9 +65,7 @@ app.use('/game/', game);
 
 //Catch 404
 app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+    res.status(404).render('404');
 });
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/web_monopoly');

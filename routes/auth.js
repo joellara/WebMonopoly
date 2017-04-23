@@ -6,17 +6,18 @@ var crypto = require('crypto');
 
 var router = express.Router();
 var User = require(path.join(__dirname, '../models/Users.js'));
-
+//get Hash for specific text, with salt, or create new hash
 function getHash(str, salt = crypto.randomBytes(256)) {
     let password = str.trim();
     let hash = crypto.pbkdf2Sync(password, salt.toString('hex'), 2000, 512, 'sha512');
     return [hash, salt];
 }
-/* GET home page. */
+/* Rest API Server for authentication for login and logout */
 router.get('/', function(req, res, next) {
     res.redirect('/');
 });
 
+//set cookies for login, check if user exists
 router.post('/login/', function(req, res, next) {
     let [password, ] = getHash(req.body.password.trim());
     User.findOne({ username: req.body.username}, (err, user) => {
@@ -63,6 +64,7 @@ router.post('/login/', function(req, res, next) {
     });
 });
 
+//add new user
 router.post('/signup/', function(req, res, next) {
     User.count({ username: req.body.username }, (err, count) => {
         if (count === 0) {
@@ -105,6 +107,7 @@ router.post('/signup/', function(req, res, next) {
     });
 });
 
+//delete logout
 router.post('/logout/', function(req, res, next) {
     req.session.user_id = undefined;
     req.session.user_name = undefined;

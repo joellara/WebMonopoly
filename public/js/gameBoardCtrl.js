@@ -73,7 +73,7 @@ let dataBoard = [
         name:"Kings cross station",
         price:"200",
         color:"",
-        type:1
+        type:2
     },{
         name:"The angel, islington",
         price:"100",

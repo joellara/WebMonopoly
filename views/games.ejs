@@ -4,6 +4,13 @@
             <h1><%= title %></h1>
         </div>
     </div>
+    <div class="row hidden" id="errorBlock">
+        <div class="col-xs-12 text-center">
+            <div class="alert alert-danger alert-dismissible" role="alert" id="errorMsgBlock">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="panel panel-default">
@@ -24,6 +31,31 @@
     </div>
     <div class="row">
         <div class="col-xs-12">
+            <div class="row hidden" id="errorConnectBlock">
+                <div class="col-xs-12 text-center">
+                    <div class="alert alert-info alert-dismissible" role="alert" id="errorConnectMsgBlock">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Conectar a un juego.</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="connectGameForm" action="/game/" method="POST">
+                        <div class="form-group">
+                            <label  for="name">ingresa el id del juego para conectar. </label>
+                            <input name="name" type="text" class="form-control" id="connectGameId" placeholder="ID del juego">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Conectar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3>Juegos pendientes</h3>
@@ -31,11 +63,14 @@
                 <ul class="list-group">
                     <div class="row">
                         <% for(var i = 0; i < games.length;i++){%>
-                            <div class="col-xs-11">
+                            <div class="col-xs-8">
                                 <a href="/game/<%= games[i]._id%>" target="_blank" class="list-group-item"><%= games[i].name%></a>
                             </div>
+                            <div class="col-xs-3">
+                                <p class="list-group-item text-center"> <strong>id=</strong> <%= games[i]._id%> </p>
+                            </div>
                             <div class="col-xs-1">
-                                <a target="_blank" class="list-group-item text-center btn btn-danger"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> </a>
+                                <a href="#delete" id="<%= games[i]._id%>" class="list-group-item text-center btn btn-danger"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                             </div>
                         <% }%>
                     </div>

@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
+//Base routes
+
+//get index page
 router.get('/', function(req, res, next) {
     res.render('index', {
         title: 'Web Monopoly',
@@ -12,6 +15,7 @@ router.get('/', function(req, res, next) {
     });
 });
 
+//Get about page
 router.get('/about', function(req, res, next) {
     res.render('about', {
         user: {
@@ -22,6 +26,7 @@ router.get('/about', function(req, res, next) {
     });
 });
 
+//Get login page
 router.get('/login/', function(req, res, next) {
     res.render('login', {
         user: {
@@ -32,6 +37,7 @@ router.get('/login/', function(req, res, next) {
     });
 });
 
+//get signup page
 router.get('/sign-up/', function(req, res, next) {
     res.render('signup', {
         user: {

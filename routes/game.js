@@ -18,7 +18,7 @@ router.get('/',(req, res, next) => {
         'players.id': req.session.user_id
     }, (err, games) => {
         if(err)res.render('error',{error:'Tuvimos un error interno, intente más tarde'});
-        res.render('game', {
+        res.render('games', {
             title: 'Juegos',
             user: {
                 id: req.session.user_id,
@@ -49,7 +49,7 @@ router.get('/:id', function(req, res, next) {
                 'players.id': req.session.user_id
             }, (err, games) => {
                 if(err)res.render('error',{error:'Tuvimos un error interno, intente más tarde'});
-                res.render('game', {
+                res.render('games', {
                     title: 'Juegos',
                     user: {
                         id: req.session.user_id,
@@ -60,6 +60,18 @@ router.get('/:id', function(req, res, next) {
                 });
             });
         }
+    });
+});
+router.delete('/:id',(req,res,nest)=>{
+    Game.findOne({
+        'players.id': req.session.user_id,
+        _id: req.params.id
+    },(err,game)=>{
+        if (err) res.json({
+            valid: false,
+            message: 'Error interno. Intente de nuevo más tarde.'
+        });
+
     });
 });
 router.post('/', (req, res, next) => {

@@ -92,7 +92,7 @@ router.delete('/:id', (req, res, nest) => {
             if (game.players.length > 1) {
                 let indexToDel = -1;
                 game.players.forEach((player, index, players) => {
-                    if (players.id == req.session.user_id) {
+                    if (player.id == req.session.user_id) {
                         indexToDel = index;
                     }
                 });

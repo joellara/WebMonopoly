@@ -320,4 +320,5 @@ function createBoard(){
 }
 $(document).ready(function(){
     $('#gameBoard').empty().html(createBoard());
+    var socket = io();
 });

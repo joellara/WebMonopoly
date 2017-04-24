@@ -56,23 +56,30 @@
     </div>
     <div class="row">
         <div class="col-xs-12">
+            <div class="row hidden" id="actualGameBlock">
+                <div class="col-xs-12 text-center">
+                    <div class="alert alert-info alert-dismissible" role="alert" id="actualGameMsgBlock">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                </div>
+            </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3>Juegos pendientes</h3>
                 </div>
                 <ul class="list-group">
                     <div class="row">
-                        <% for(var i = 0; i < games.length;i++){%>
+                        <% for(var i = 0; i < games.length ; i++ ) { %>
                             <div class="col-xs-8">
-                                <a href="/game/<%= games[i]._id%>" target="_blank" class="list-group-item"><%= games[i].name%></a>
+                                <a href="#game" id="<%= games[i]._id %>" class="list-group-item"><%= games[i].name %></a>
                             </div>
                             <div class="col-xs-3">
-                                <p class="list-group-item text-center"> <strong>id=</strong> <%= games[i]._id%> </p>
+                                <p class="list-group-item text-center"> <strong> id= </strong> <%= games[i]._id %> </p>
                             </div>
                             <div class="col-xs-1">
                                 <a href="#delete" id="<%= games[i]._id%>" class="list-group-item text-center btn btn-danger"> <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                             </div>
-                        <% }%>
+                        <% } %>
                     </div>
                 </ul>
             </div>

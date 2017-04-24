@@ -15,11 +15,11 @@ router.all('*', function(req, res, next) {
 });
 
 //get all games based on session player
-router.get('/',(req, res, next) => {
+router.get('/', (req, res, next) => {
     Game.find({
         'players.id': req.session.user_id
     }, (err, games) => {
-        if(err)res.render('error',{error:'Tuvimos un error interno, intente más tarde'});
+        if (err) res.render('error', { error: 'Tuvimos un error interno, intente más tarde' });
         res.render('games', {
             title: 'Juegos',
             user: {
@@ -38,8 +38,12 @@ router.get('/:id', function(req, res, next) {
         'players.id': req.session.user_id,
         _id: req.params.id
     }, (err, game) => {
-        if(err) res.render('error',{error:'Tuvimos un error interno, intente más tarde'});
-        if (typeof game !== "undefined" && game !== null) {
+        if (err) res.render('error', {
+            error: 'Tuvimos un error interno, intente más tarde'
+        });
+        if(typeof game !== "undefined" && game !== null && game.players.length < 2 ){
+            res.redirect('/game/');
+        }else if (typeof game !== "undefined" && game !== null ) {
             res.render('gameBoard', {
                 title: '¡A jugar!',
                 user: {
@@ -48,11 +52,11 @@ router.get('/:id', function(req, res, next) {
                     username: req.session.user_username
                 }
             });
-        }else{
+        } else {
             Game.find({
                 'players.id': req.session.user_id
             }, (err, games) => {
-                if(err)res.render('error',{error:'Tuvimos un error interno, intente más tarde'});
+                if (err) res.render('error', { error: 'Tuvimos un error interno, intente más tarde' });
                 res.render('games', {
                     title: 'Juegos',
                     user: {
@@ -68,55 +72,55 @@ router.get('/:id', function(req, res, next) {
 });
 
 //Delete an specific game
-router.delete('/',(req,res,nest)=>{
+router.delete('/:id', (req, res, nest) => {
     Game.findOne({
         'players.id': req.session.user_id,
-        _id: req.body.id
-    },(err,game)=>{
+        _id: req.params.id
+    }, (err, game) => {
         if (err) res.json({
             valid: false,
             message: 'Error interno. Intente de nuevo más tarde.'
         });
-        if(game === null){
+        if (game === null) {
             res.json({
                 valid: true,
                 deleted: false,
                 message: 'No se encontró el juego con ese id..'
             });
-        }else{
-            if(game.players.length > 1 ){
+        } else {
+            if (game.players.length > 1) {
                 let indexToDel = -1;
-                game.players.forEach((player,index,players)=>{
-                    if(players.user_id == req.session.user_id){
+                game.players.forEach((player, index, players) => {
+                    if (players.user_id == req.session.user_id) {
                         indexToDel = index;
                     }
                 });
-                game.players.splice(indexToDel,1);
-                game.save((err,game)=>{
+                game.players.splice(indexToDel, 1);
+                game.save((err, game) => {
                     if (err) res.json({
                         valid: false,
                         message: 'Error interno. Intente de nuevo más tarde.'
                     });
                     res.json({
-                        valid:true,
-                        deleted:true,
-                        message:'Te hemos eleminado del juego con el nombre: '+ game.name
+                        valid: true,
+                        deleted: true,
+                        message: 'Te hemos eleminado del juego con el nombre: ' + game.name
                     });
                 });
-            }else{
+            } else {
                 Game.findByIdAndRemove({
                     'players.id': req.session.user_id,
-                    _id: req.body.id
-                },(err,game)=>{
+                    _id: req.params.id
+                }, (err, game) => {
                     if (err) res.json({
                         valid: false,
                         message: 'Error interno. Intente de nuevo más tarde.'
                     });
-                    if(typeof game !== "undefined" && game !== null){
+                    if (typeof game !== "undefined" && game !== null) {
                         res.json({
                             valid: true,
                             deleted: true,
-                            message: 'Te hemos eleminado del juego con el nombre: '+ game.name
+                            message: 'Te hemos eleminado del juego con el nombre: ' + game.name
                         });
                     }
                 });
@@ -150,71 +154,73 @@ router.post('/', (req, res, next) => {
     }
 });
 
-router.put('/',(req,res,next)=>{
-    var gameId = req.body.gameId;
+//Add people to game
+router.put('/:id', (req, res, next) => {
+    var gameId = req.params.id;
     Game.findOne({
-        _id:gameId
-    },(err,game)=>{
+        _id: gameId
+    }, (err, game) => {
         if (err) res.json({
             valid: false,
             message: 'Error interno. Intente de nuevo más tarde.'
         });
-        if(typeof game !== "undefined" && game !== null){
+        if (typeof game !== "undefined" && game !== null) {
             let found = false;
             let rst = {};
-            if(game.status !== "Started" && game.status !== "Finished"){
-                if(game.players.length >= 3){
+            if (game.status !== "Started" && game.status !== "Finished") {
+                if (game.players.length >= 3) {
                     res.json({
-                        valid:true,
-                        error:true,
-                        message:'El juego ya tiene 4 jugadores'
+                        valid: true,
+                        error: true,
+                        message: 'El juego ya tiene 4 jugadores'
                     });
-                }else{
-                    game.players.forEach((player,index,players)=>{
-                        if(player.id == req.session.user_id){
+                } else {
+                    game.players.forEach((player, index, players) => {
+                        if (player.id == req.session.user_id) {
                             found = true;
                             rst = {
                                 valid: true,
-                                new:false,
-                                error:false,
+                                new: false,
+                                error: false,
                                 message: 'Ya estas unido al juego',
                                 gameId: game._id
                             };
                         }
                     });
-                    if(!found){
-                        game.players.push({id:req.session.user_id});
-                        game.save((err,game)=>{
+                    if (!found) {
+                        game.players.push({ id: req.session.user_id });
+                        game.save((err, game) => {
                             if (err) res.json({
                                 valid: false,
                                 message: 'Error interno. Intente de nuevo más tarde.'
                             });
                             res.json({
-                                valid:true,
-                                error:false,
-                                new:true,
-                                message:'Te agregamos al juego con el id='+game.id,
-                                gameId:game.id
+                                valid: true,
+                                error: false,
+                                new: true,
+                                message: 'Te agregamos al juego con el id=' + game.id,
+                                gameId: game.id
                             });
                         });
-                    }else{
+                    } else {
                         res.json(rst);
                     }
                 }
-            }else{
+            } else {
                 res.json({
-                    valid:true,
-                    error:true,
-                    message:'El juego ya está empezado, no te puedes unir.'
+                    valid: true,
+                    error: true,
+                    message: 'El juego ya está empezado, no te puedes unir.'
                 });
             }
-        }else{
+        } else {
             res.json({
-                valid:true,
-                completed:false,
-                message:'El juego no existe.'
+                valid: true,
+                completed: false,
+                message: 'El juego no existe.'
             });
         }
     });
 });
+
 module.exports = router;

@@ -6,21 +6,16 @@ $(document).ready(function() {
             name: name
         }, function(data) {
             if (typeof data !== "undefined" && data !== "") {
-                console.log(data);
                 window.location.replace('/game/' + data.gameId);
             }
         });
     });
-
     $('#connectGameForm').submit(function(event) {
         event.preventDefault();
         let gameId = $('#connectGameId').val().trim();
         $.ajax({
-            url: '/game/',
+            url: '/game/'+gameId,
             type: 'PUT',
-            data: {
-                gameId: gameId
-            },
             success: function(data) {
                 if (typeof data !== "undefined" && data !== "" && data.valid !== false) {
                     if(data.error === false){
@@ -41,20 +36,17 @@ $(document).ready(function() {
     $('a[href="#delete"]').click(function(event) {
         var target = $(event.currentTarget);
         $.ajax({
-            url: '/game/',
-            data: {
-                id: target.attr('id')
-            },
+            url: '/game/'+target.attr('id'),
             type: 'DELETE',
             success: function(data) {
                 if (typeof data !== "undefined" && data !== null) {
                     if (data.valid === false) {
                         $('#errorBlock').removeClass('hidden');
-                        $('#errorMsgBlock').append('<p><strong>Ohh, shoo  </strong>We had a problem');
+                        $('#errorMsgBlock').append('<p><strong>Ohh, shoo  </strong>We had a problem</p>');
                     } else {
                         if (data.deleted === false) {
                             $('#errorBlock').removeClass('hidden');
-                            $('#errorMsgBlock').append('<p><strong>Ohh, shoo  </strong>No se pudo borrar.');
+                            $('#errorMsgBlock').append('<p><strong>Ohh, shoo  </strong>No se pudo borrar.</p>');
                         } else {
                             window.location.replace('/game/');
                         }
@@ -63,4 +55,21 @@ $(document).ready(function() {
             }
         });
     });
+    $('a[href="#game"]').click(function(event){
+        $.get('/api/'+$(event.currentTarget).attr('id'),function(data){
+            console.log(data);
+            if(data.valid === true && data.result === true){
+                if(data.players.length < 2){
+                    $('#actualGameBlock').removeClass('hidden');
+                    $('#actualGameMsgBlock').append('<p><strong>Ohh, shoo  </strong>Debe haber al menos dos jugadores en este juego.</p>');
+                }else{
+                    window.location.replace('/game/'+data.id);
+                }
+            }else{
+                $('#actualGameBlock').removeClass('hidden');
+                $('#actualGameMsgBlock').append('<p><strong>Ohh, shoo  </strong>We fdhad a problem</p>');
+            }
+        });
+    });
+
 });

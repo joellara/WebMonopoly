@@ -26,6 +26,10 @@ var gameSchema = mongoose.Schema({
                 type: String,
                 defualt: ""
             },
+            position:{
+                type:Number,
+                default:0
+            },
             token: {
                 type: String,
                 default: "NoToken"
@@ -66,12 +70,21 @@ gameSchema.methods.buyProperty = function(playerId, cardId, price) {
     } else {
         this.players.forEach((player, index, players) => {
             if (player.id === playerId) {
-                player.status.properties.push(cardId);
-                rst = {
-                    valid: true,
-                    bought: true,
-                    message: 'Player bought property with id= ' + cardId
-                };
+                if(player.status.money >= price){
+                    player.status.money -= price;
+                    player.status.properties.push(cardId);
+                    rst = {
+                        valid: true,
+                        bought: true,
+                        message: 'Player bought property with id= ' + cardId
+                    };
+                }else{
+                    rst = {
+                        valid: true,
+                        bought: false,
+                        message: "Player didn't have enough money"
+                    };
+                }
             }
         });
     }
@@ -116,9 +129,25 @@ gameSchema.methods.pay = function(playerId, cardId, price) {
             message: 'The property is not owned.'
         };
     }
+    this.checkEndGame();
     return rst;
 };
 gameSchema.methods.shiftTurn = function(){
     this.turn = (this.turn+1) % this.players.length;
+    return this.turn;
+};
+gameSchema.methods.checkEndGame = function(){
+    let count = 0;
+    this.players.forEach((player,index,players)=>{
+        if(player.status.money < 0){
+            count++;
+        }
+    });
+    if(count == this.players.length-1){
+        this.status = "Finished";
+        return true;
+    }else{
+        return false;
+    }
 };
 module.exports = mongoose.model('Game', gameSchema);

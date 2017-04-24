@@ -15,8 +15,7 @@ var index = require(path.join(__dirname, 'routes/index.js'));
 var user = require(path.join(__dirname, 'routes/user.js'));
 var auth = require(path.join(__dirname, 'routes/auth.js'));
 var game = require(path.join(__dirname, 'routes/game.js'));
-
-var app = express();
+var api = require(path.join(__dirname, 'routes/api.js'));
 
 //HTTP & HTTPS
 var options = {
@@ -32,6 +31,13 @@ function ensureSecure(req, res, next) {
     // res.redirect('https://' + req.host + req.url); // express 3.x
     res.redirect('https://' + req.hostname + req.url); // express 4.x
 }
+
+//Initialize handler http(express) and socket.io
+var app = express();
+let httpServ = http.createServer(app);
+let httpsServ = https.createServer(options, app);
+var io = require('socket.io')(httpsServ);
+
 
 //EJS Settings
 app.set('views', path.join(__dirname, 'views'));
@@ -62,20 +68,29 @@ app.use('/', index);
 app.use('/auth/', auth);
 app.use('/user/', user);
 app.use('/game/', game);
-
+app.use('/api/', api);
 //Catch 404
 app.use(function(req, res, next) {
     res.status(404).render('404');
 });
 
+io.on('connection', function(socket){
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
+});
+
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/web_monopoly');
 mongoose.connection.on('open', () => {
     console.log('Connected to MongoDB');
-    let httpServ = http.createServer(app).listen(process.env.port ||  80, function() {
+
+    httpServ.listen(process.env.port ||  80, function() {
         let port = httpServ.address().port;
         console.log("Unsecure app now running on port", port);
     });
-    let httpsServ = https.createServer(options, app).listen(process.env.port ||  443, function() {
+
+    httpsServ.listen(process.env.port ||  443, function() {
         let port = httpsServ.address().port;
         console.log("Secure app now running on port", port);
     });

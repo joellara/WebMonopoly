@@ -57,7 +57,6 @@ $(document).ready(function() {
     });
     $('a[href="#game"]').click(function(event){
         $.get('/api/'+$(event.currentTarget).attr('id'),function(data){
-            console.log(data);
             if(data.valid === true && data.result === true){
                 if(data.players.length < 2){
                     $('#actualGameBlock').removeClass('hidden');

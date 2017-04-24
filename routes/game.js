@@ -50,7 +50,8 @@ router.get('/:id', function(req, res, next) {
                     id: req.session.user_id,
                     name: req.session.user_name,
                     username: req.session.user_username
-                }
+                },
+                gameId:req.params.id
             });
         } else {
             Game.find({
@@ -168,7 +169,7 @@ router.put('/:id', (req, res, next) => {
             let found = false;
             let rst = {};
             if (game.status !== "Started" && game.status !== "Finished") {
-                if (game.players.length >= 3) {
+                if (game.players.length > 3) {
                     res.json({
                         valid: true,
                         error: true,

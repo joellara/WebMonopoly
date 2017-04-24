@@ -37,7 +37,7 @@ var app = express();
 let httpServ = http.createServer(app);
 let httpsServ = https.createServer(options, app);
 var io = require('socket.io')(httpsServ);
-
+require(path.join(__dirname,'config/gameSocket.js'))(io);
 
 //EJS Settings
 app.set('views', path.join(__dirname, 'views'));
@@ -74,12 +74,7 @@ app.use(function(req, res, next) {
     res.status(404).render('404');
 });
 
-io.on('connection', function(socket){
-    console.log('a user connected');
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
-    });
-});
+
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/web_monopoly');
 mongoose.connection.on('open', () => {

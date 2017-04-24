@@ -17,7 +17,6 @@ router.get('/:id', (req, res, next) => {
             valid: false,
             message: 'Tuvimos un error interno, intente más tarde'
         });
-        console.log(game);
         if (typeof game !== "undefined" && game !== null) {
             res.json({
                 valid:true,

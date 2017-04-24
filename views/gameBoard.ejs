@@ -1,3 +1,19 @@
+<div class="container">
+    <div class="row">
+        <div class="col-xs-6 text-center">
+            <h1><%= title %> </h1>
+        </div>
+        <div class="col-xs-6 text-center">
+            <h1>Connected users</h1>
+            <ul class="list-group" id="usersList">
+
+            </ul>
+        </div>
+        <p class="hidden" id="userId"><%= user.id %></p>
+        <p class="hidden" id="gameId"><%= gameId %></p>
+        <p class="hidden" id="userName"><%= user.name %></p>
+    </div>
+</div>
 <div class="container" id="gameBoard">
 </div>
 <script src="/socket.io/socket.io.js"></script>

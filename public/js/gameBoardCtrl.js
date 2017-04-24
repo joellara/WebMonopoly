@@ -322,12 +322,39 @@ $(document).ready(function() {
             $('#usersList').append('<li class="list-group-item">' + user.name + '</li>');
         });
     }
-    $('#gameBoard').empty().html(createBoard());
+    let globalVars;
+    function getInitialState() {
+        //Check initial state
+        $.ajax({
+            url: '/api/state/' + gameId,
+            type: 'GET',
+            error: function() {
+                console.log('Ohh, shoo');
+            },
+            success: function(data) {
+                if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
+                    globalVars = data.game;
+                    if (data.game.status === "Started" ) {
+                        //Started or not
+                        $('#startGame').attr('disabled', true);
+                        $('#startGame').text('Juego empezado.');
+                    }else if(data.game.status === "Finished"){
+                        $('#startGame').attr('disabled', true);
+                        $('#startGame').text('El juego ha terminado.');
+                    }
+                } else {
+                    console.log('We had an error');
+                }
+            }
+        });
+    }
     let usersInGame = [];
     let socket = io();
     let gameId = $('#gameId').text();
     let userId = $('#userId').text();
     let userName = $('#userName').text();
+    let myTurn = false;
+    $('#gameBoard').empty().html(createBoard());
 
     socket.on('joinGame', function(msg) {
         if (msg.gameId === gameId) {
@@ -335,21 +362,21 @@ $(document).ready(function() {
                 if (user.id !== userId) {
                     usersInGame.push({
                         id: user.id,
-                        name:user.name
+                        name: user.name
                     });
                 }
             });
             updateUsers();
         }
     });
-    socket.on('newUser',function(msg){
+    socket.on('newUser', function(msg) {
         if (msg.gameId === gameId) {
             usersInGame.push(msg.user);
             updateUsers();
         }
     });
     socket.on('connect', function() {
-        console.log('Connected with my userId: ' + userId);
+        getInitialState();
         socket.emit('joinGame', {
             gameId: gameId,
             userId: userId,
@@ -357,19 +384,50 @@ $(document).ready(function() {
         });
     });
     socket.on('disconnect', function() {
-        console.log('Disconnected with my userId: ' + userId);
+
     });
     socket.on('leaveGame', function(msg) {
         if (msg.gameId === gameId) {
-            console.log('User left');
             let indexO = -1;
-            usersInGame.forEach((user,index,users)=>{
-                if(user.id === msg.userId){
+            usersInGame.forEach((user, index, users) => {
+                if (user.id === msg.userId) {
                     indexO = index;
                 }
             });
-            usersInGame.splice(indexO,1);
+            usersInGame.splice(indexO, 1);
             updateUsers();
         }
+    });
+    //make a move
+    socket.on('move', function(msg) {
+
+    });
+
+    //start game
+    socket.on('startGame', function() {
+        $('#startGame').attr('disabled', true);
+        $('#startGame').text('Juego empezado.');
+        globalVars.status = "Started";
+    });
+
+
+    $('#startGame').click(function() {
+        $.ajax({
+            url: '/api/' + gameId + '/start/',
+            type: 'POST',
+            error: function() {
+                console.log('Ohh, shoo');
+            },
+            success: function(data) {
+                if (typeof data !== "undefined" && data !== null && data.valid === true) {
+                    globalVars.status = "Started";
+                    $('#startGame').attr('disabled', true);
+                    $('#startGame').text('Juego empezado.');
+                    socket.emit('startGame');
+                } else {
+                    console.log('We had an error');
+                }
+            }
+        });
     });
 });

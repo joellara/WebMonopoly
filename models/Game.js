@@ -15,7 +15,10 @@ var gameSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    turn:Number,
+    turn:{
+        type:Number,
+        default:0
+    },
     players: [{
         id: { //attribute
             type: mongoose.Schema.Types.ObjectId,

@@ -1,3 +1,6 @@
+var path = require('path');
+var Game = require(path.join(__dirname, '../models/Game.js'));
+
 module.exports = function(io) {
     let games = {};
     io.on('connection', function(socket) {
@@ -54,6 +57,9 @@ module.exports = function(io) {
 
         socket.on('move',function(msg){
 
+        });
+        socket.on('startGame',function(){
+            socket.broadcast.emit('startGame');
         });
     });
 };

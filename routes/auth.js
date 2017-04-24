@@ -10,7 +10,7 @@ var User = require(path.join(__dirname, '../models/Users.js'));
 function getHash(str, salt = crypto.randomBytes(256)) {
     let password = str.trim();
     let hash = crypto.pbkdf2Sync(password, salt.toString('hex'), 2000, 512, 'sha512');
-    return [hash, salt];
+    return [hash.toString('hex'), salt.toString('hex')];
 }
 /* Rest API Server for authentication for login and logout */
 router.get('/', function(req, res, next) {
@@ -20,33 +20,37 @@ router.get('/', function(req, res, next) {
 //set cookies for login, check if user exists
 router.post('/login/', function(req, res, next) {
     let [password, ] = getHash(req.body.password.trim());
-    User.findOne({ username: req.body.username}, (err, user) => {
+    User.findOne({ username: req.body.username }, (err, user) => {
         if (err) res.json({
             valid: false,
             message: 'Error interno, intente de nuevo más tarde.'
         });
         if (typeof user !== undefined && user !== null) {
-            let [password,] = getHash(req.body.password.trim(),user.salt);
-            User.findOne({username:req.body.username,password:password},(err2,user2)=>{
+            let [password, ] = getHash(req.body.password.trim(), user.salt);
+            User.findOne({
+                username: req.body.username,
+                password: password
+            }, (err2, user2) => {
                 if (err2) res.json({
                     valid: false,
                     message: 'Error interno, intente de nuevo más tarde.'
                 });
-                if (typeof user2 !== undefined && user !== null) {
-                    req.session.user_id = user._id;
-                    req.session.user_name = user.name;
-                    req.session.user_username = user.username;
+                console.log(user2);
+                if (typeof user2 !== undefined && user2 !== null) {
+                    req.session.user_id = user2._id;
+                    req.session.user_name = user2.name;
+                    req.session.user_username = user2.username;
                     res.json({
                         valid: true,
                         loggedIn: true,
-                        message: '¡Bienvenid@, ' + user.name + '!',
+                        message: '¡Bienvenid@, ' + user2.name + '!',
                         player: {
-                            id: user._id,
-                            name: user.name
+                            id: user2._id,
+                            name: user2.name
                         },
                         redirect: req.session.redirect
                     });
-                }else{
+                } else {
                     res.json({
                         valid: true,
                         loggedIn: false,
@@ -75,7 +79,7 @@ router.post('/signup/', function(req, res, next) {
             let [password, salt] = getHash(req.body.password.trim());
             var newUser = new User({ name: req.body.name, username: req.body.username, password: password, salt: salt });
             if (newUser !== undefined && newUser !== null) {
-                newUser.save(function(err, user){
+                newUser.save(function(err, user) {
                     if (err) res.json({
                         valid: false,
                         message: 'Error interno. Intente de nuevo más tarde.'
@@ -86,7 +90,7 @@ router.post('/signup/', function(req, res, next) {
                     res.json({
                         valid: true,
                         loggedIn: true,
-                        created:true,
+                        created: true,
                         message: '¡Usuario ' + user.username + ' creado con éxito!',
                         player: {
                             id: user._id,
@@ -99,7 +103,7 @@ router.post('/signup/', function(req, res, next) {
         } else {
             res.json({
                 valid: true,
-                created:false,
+                created: false,
                 message: 'Ya existe ese usuario'
             });
         }

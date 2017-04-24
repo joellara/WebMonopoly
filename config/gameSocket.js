@@ -51,5 +51,9 @@ module.exports = function(io) {
                 console.log('Usuarios adentro:',games[msg.gameId]);
             }
         });
+
+        socket.on('move',function(msg){
+
+        });
     });
 };

@@ -92,7 +92,7 @@ router.delete('/:id', (req, res, nest) => {
             if (game.players.length > 1) {
                 let indexToDel = -1;
                 game.players.forEach((player, index, players) => {
-                    if (players.user_id == req.session.user_id) {
+                    if (players.id == req.session.user_id) {
                         indexToDel = index;
                     }
                 });
@@ -105,7 +105,7 @@ router.delete('/:id', (req, res, nest) => {
                     res.json({
                         valid: true,
                         deleted: true,
-                        message: 'Te hemos eleminado del juego con el nombre: ' + game.name
+                        message: 'Te hemos eliminado del juego con el nombre: ' + game.name
                     });
                 });
             } else {

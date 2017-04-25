@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var data = require('../config/data.json').data;
 
 var gameSchema = mongoose.Schema({
     id: mongoose.Schema.Types.ObjectId,
@@ -15,9 +16,13 @@ var gameSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    turn:{
-        type:Number,
-        default:0
+    turn: {
+        type: Number,
+        default: 0
+    },
+    canMove: {
+        type: Boolean,
+        default: true
     },
     players: [{
         id: { //attribute
@@ -29,9 +34,9 @@ var gameSchema = mongoose.Schema({
                 type: String,
                 defualt: ""
             },
-            position:{
-                type:Number,
-                default:0
+            position: {
+                type: Number,
+                default: 0
             },
             token: {
                 type: String,
@@ -48,8 +53,9 @@ var gameSchema = mongoose.Schema({
         }
     }]
 });
-gameSchema.methods.propertyIsOwned = function(cardId) {
+gameSchema.methods.propertyIsOwned = function() {
     let found = false;
+    let cardId = this.players[this.turn].status.position;
     this.players.forEach((player, index, players) => {
         player.status.properties.forEach((property, index, properties) => {
             if (property === cardId) {
@@ -59,98 +65,72 @@ gameSchema.methods.propertyIsOwned = function(cardId) {
     });
     return found;
 };
-gameSchema.methods.buyProperty = function(playerId, cardId, price) {
-    let rst = {
-        valid: false,
-        message: 'We had an internal error'
-    };
-    if (this.propertyIsOwned(cardId)) {
-        return {
-            valid: true,
-            bought: false,
-            message: 'The property is owned by someone.'
-        };
-    } else {
-        this.players.forEach((player, index, players) => {
-            if (player.id === playerId) {
-                if(player.status.money >= price){
-                    player.status.money -= price;
-                    player.status.properties.push(cardId);
-                    rst = {
-                        valid: true,
-                        bought: true,
-                        message: 'Player bought property with id= ' + cardId
-                    };
-                }else{
-                    rst = {
-                        valid: true,
-                        bought: false,
-                        message: "Player didn't have enough money"
-                    };
-                }
+gameSchema.methods.buyProperty = function() {
+    let playerId = this.players[this.turn].id;
+    let price = data[this.players[this.turn].status.position].price;
+    let cardId = this.players[this.turn].status.position;
+    this.players.forEach((player, index, players) => {
+        if (player.id === playerId) {
+            if (player.status.money >= price) {
+                player.status.money -= price;
+                player.status.properties.push(cardId);
             }
-        });
-    }
-    return rst;
+        }
+    });
 };
-gameSchema.methods.pay = function(playerId, cardId, price) {
-    let rst = {};
-    money = 0;
-    if (this.propertyIsOwned(cardId)) {
-        this.players.forEach((player, index, players) => {
-            if(player.id == playerId){
-                if(player.status.state !== "Lost" && player.status.money > 0 ){
-                    money = player.status.money;
-                    player.status.money -= price;
-                    if(player.status.money < 0){
-                        player.status.state = "Lost";
-                        rst = {
-                            valid:true,
-                            lost:true,
-                            message:'Player lost'
-                        };
-                    }
-                }
+gameSchema.methods.pay = function() {
+    let money = 0;
+    let playerId = this.players[this.turn].id;
+    let price = data[this.players[this.turn].status.position].price;
+    let cardId = this.players[this.turn].status.position;
+    this.players.forEach((player, index, players) => {
+        if (player.id == playerId) {
+            money = player.status.money;
+            player.status.money -= price;
+            if (player.status.money < 0) {
+                player.status.state = "Lost";
             }
-        });
-        this.players.forEach((player, index, players) => {
+        }
+    });
+    this.players.forEach((player, index, players) => {
+        if (player.id !== playerId) {
             player.status.properties.forEach((property, index, properties) => {
                 if (property === cardId) {
-                    player.status.money+=money;
-                    rst = {
-                        valid:true,
-                        payed:true,
-                        message:'Player payed'
-                    };
+                    player.status.money += money;
                 }
             });
-        });
-    } else {
-        return {
-            valid: true,
-            pay: false,
-            message: 'The property is not owned.'
-        };
-    }
-    this.checkEndGame();
-    return rst;
+        }
+    });
+    //this.checkEndGame();
 };
-gameSchema.methods.shiftTurn = function(){
-    this.turn = (this.turn+1) % this.players.length;
+gameSchema.methods.nextTurn = function() {
+    this.turn = (this.turn + 1) % this.players.length;
+    this.canMove = true;
     return this.turn;
 };
-gameSchema.methods.checkEndGame = function(){
+gameSchema.methods.checkEndGame = function() {
     let count = 0;
-    this.players.forEach((player,index,players)=>{
-        if(player.status.money < 0){
+    this.players.forEach((player, index, players) => {
+        if (player.status.money < 0) {
             count++;
         }
     });
-    if(count == this.players.length-1){
+    if (count == this.players.length - 1) {
         this.status = "Finished";
         return true;
-    }else{
+    } else {
         return false;
     }
+};
+gameSchema.methods.move = function(playerId, count) {
+    let position;
+    this.players.forEach((player, index, players) => {
+        if (player.id.toString() === playerId && index === this.turn) {
+            player.status.position = (player.status.position + count) % (data.length - 1);
+            position = player.status.position;
+        }
+    });
+    this.canMove = false;
+    return position;
 };
 module.exports = mongoose.model('Game', gameSchema);

@@ -316,36 +316,87 @@ function createBoard() {
     return htmlBoard;
 }
 $(document).ready(function() {
-    function updateUsers() {
-        $('#usersList').empty();
-        usersInGame.forEach(function(user, index, users) {
-            $('#usersList').append('<li class="list-group-item">' + user.name + '</li>');
+    function updateBoard() {
+        $.ajax({
+            url: '/api/state/' + gameId,
+            type: 'GET'
+        }).done(function(data) {
+            if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
+                globalVars = data.game;
+                for (let i = 0; i < globalVars.players.length; i++) {
+                    $('#' + globalVars.players[i].id).remove();
+                    $('#' + globalVars.players[i].status.position).append('<img src="/img/tokens/cannon.svg" alt="User" class="abs" id="' + globalVars.players[i].id + '"/>');
+                    for (let j = 0; j < globalVars.players[i].status.properties.length; j++) {
+                        $('#' + globalVars.players[i].status.properties[j]).addClass('owned');
+                    }
+                }
+                if (data.game.status === "Started") {
+                    $('#startGame').attr('disabled',true);
+                    $('#startGame').text('Juego empezado.');
+                    if (userId == globalVars.players[globalVars.turn].id && globalVars.canMove === true) {
+                        $('#rollDice').removeAttr('disabled');
+                    } else {
+                        $('#rollDice').attr('disabled',true);
+                    }
+                    if (userId == globalVars.players[globalVars.turn].id && globalVars.canMove === false) {
+                        $('#buyProperty').removeAttr('disabled');
+                    } else {
+                        $('#buyProperty').attr('disabled',true);
+                    }
+                    $('#money').text(globalVars.players[myTurn].status.money);
+                }else if(data.game.status === "Finished"){
+                    $('#startGame').attr('disabled',true);
+                    $('#startGame').text('Juego empezado.');
+                }
+                updateUsers();
+            }
         });
     }
+    function updateUsers() {
+        $('#usersList').empty();
+        if (typeof globalVars !== "undefined" && globalVars !== null) {
+            usersInGame.forEach(function(user, index, users) {
+                let classe = "";
+                if (user.id === globalVars.players[globalVars.turn].id) {
+                    classe +="active ";
+                }
+                $('#usersList').append('<li class="'+classe+' list-group-item">' + user.name + '</li>');
+            });
+        }
+    }
     let globalVars;
+
     function getInitialState() {
         //Check initial state
         $.ajax({
             url: '/api/state/' + gameId,
-            type: 'GET',
-            error: function() {
-                console.log('Ohh, shoo');
-            },
-            success: function(data) {
-                if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
-                    globalVars = data.game;
-                    if (data.game.status === "Started" ) {
-                        //Started or not
-                        $('#startGame').attr('disabled', true);
-                        $('#startGame').text('Juego empezado.');
-                    }else if(data.game.status === "Finished"){
-                        $('#startGame').attr('disabled', true);
-                        $('#startGame').text('El juego ha terminado.');
-                    }
-                } else {
-                    console.log('We had an error');
+            type: 'GET'
+        }).done(function(data) {
+            if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
+                globalVars = data.game;
+                if (data.game.status === "Started") {
+                    //Started or not
+                    $('#startGame').attr('disabled',true);
+                    $('#startGame').text('Juego empezado.');
+                    data.game.players.forEach(function(player, index, players) {
+                        if (player.id === userId) {
+                            myTurn = index;
+                        }
+                    });
+                } else if (data.game.status === "Finished") {
+                    $('#startGame').attr('disabled',true);
+                    $('#startGame').text('El juego ha terminado.');
                 }
+                socket.emit('joinGame', {
+                    gameId: gameId,
+                    userId: userId,
+                    userName: userName
+                });
+            } else {
+                console.log('We had an error');
             }
+        }).fail(function() {
+            console.log('Ohh, shoo');
         });
     }
     let usersInGame = [];
@@ -353,35 +404,30 @@ $(document).ready(function() {
     let gameId = $('#gameId').text();
     let userId = $('#userId').text();
     let userName = $('#userName').text();
-    let myTurn = false;
+    let myTurn;
     $('#gameBoard').empty().html(createBoard());
 
     socket.on('joinGame', function(msg) {
+        console.log('joinGame');
         if (msg.gameId === gameId) {
             msg.users.forEach(function(user, index, users) {
-                if (user.id !== userId) {
-                    usersInGame.push({
-                        id: user.id,
-                        name: user.name
-                    });
-                }
+                usersInGame.push({
+                    id: user.id,
+                    name: user.name
+                });
             });
-            updateUsers();
+            updateBoard();
         }
     });
     socket.on('newUser', function(msg) {
+        console.log('newUser');
         if (msg.gameId === gameId) {
             usersInGame.push(msg.user);
-            updateUsers();
+            updateBoard();
         }
     });
     socket.on('connect', function() {
         getInitialState();
-        socket.emit('joinGame', {
-            gameId: gameId,
-            userId: userId,
-            userName: userName
-        });
     });
     socket.on('disconnect', function() {
 
@@ -395,39 +441,35 @@ $(document).ready(function() {
                 }
             });
             usersInGame.splice(indexO, 1);
-            updateUsers();
+            updateBoard();
         }
     });
+
     //make a move
     socket.on('move', function(msg) {
-
+        if (msg.gameId === gameId) {
+            updateBoard();
+        }
     });
 
     //start game
-    socket.on('startGame', function() {
-        $('#startGame').attr('disabled', true);
-        $('#startGame').text('Juego empezado.');
-        globalVars.status = "Started";
+    socket.on('startGame', function(msg) {
+        if (msg.gameId === gameId) {
+            updateBoard();
+        }
     });
-
-
     $('#startGame').click(function() {
-        $.ajax({
-            url: '/api/' + gameId + '/start/',
-            type: 'POST',
-            error: function() {
-                console.log('Ohh, shoo');
-            },
-            success: function(data) {
-                if (typeof data !== "undefined" && data !== null && data.valid === true) {
-                    globalVars.status = "Started";
-                    $('#startGame').attr('disabled', true);
-                    $('#startGame').text('Juego empezado.');
-                    socket.emit('startGame');
-                } else {
-                    console.log('We had an error');
-                }
-            }
-        });
+        socket.emit('startGame');
+    });
+    $('#rollDice').click(function() {
+        if (myTurn === globalVars.turn && globalVars.canMove === true) {
+            socket.emit('rollDice');
+        }
+    });
+    $('#buyProperty').click(function() {
+        if (myTurn === globalVars.turn && globalVars.canMove === false) {
+            console.log('buy property client.');
+            socket.emit('buyProperty');
+        }
     });
 });

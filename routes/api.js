@@ -56,41 +56,4 @@ router.get('/state/:id',(req,res,next)=>{
         }
     });
 });
-router.post('/:id/start',(req,res,next)=>{
-    Game.findOne({
-        'players.id': req.session.user_id,
-        _id: req.params.id
-    },(err,game)=>{
-        if (err) res.json({
-            valid: false,
-            message: 'Tuvimos un error interno, intente más tarde'
-        });
-        if (typeof game !== "undefined" && game !== null) {
-            if(game.status == "Started" || game.status == "Finished"){
-                res.json({
-                    valid: true,
-                    completed:false,
-                    message: 'Game has already started/finished'
-                });
-            }else{
-                game.status = "Started";
-                game.save((err,game)=>{
-                    if (err) res.json({
-                        valid: false,
-                        message: 'Tuvimos un error interno, intente más tarde'
-                    });
-                    res.json({
-                        valid:true,
-                        completed:true
-                    });
-                });
-            }
-        }else{
-            res.json({
-                valid:true,
-                result:false
-            });
-        }
-    });
-});
 module.exports = router;

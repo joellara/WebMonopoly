@@ -10,13 +10,17 @@
 
             </ul>
         </div>
-        <div class="col-xs-3">
+        <div class="col-xs-2">
             <p class="lead">Lanzar dado.</p>
             <button class="btn btn-info" id="rollDice" disabled>¡Lanzar!</button>
         </div>
-        <div class="col-xs-3">
+        <div class="col-xs-2">
             <p class="lead">Acciones</p>
             <button class="btn btn-info" id="buyProperty" disabled>Comprar.</button>
+        </div>
+        <div class="col-xs-2">
+            <p class="lead">Dinero:</p>
+            <p id="money">0</p>
         </div>
         <p class="hidden" id="userId"><%= user.id %></p>
         <p class="hidden" id="gameId"><%= gameId %></p>

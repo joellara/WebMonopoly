@@ -48,6 +48,10 @@ body {
   position: absolute;
   top: 30%;
   left: 30%;
+  background-color:gray;
+}
+.owned{
+  background-color:gray;
 }
 
 .red {

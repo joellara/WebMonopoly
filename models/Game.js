@@ -101,12 +101,10 @@ gameSchema.methods.pay = function() {
             });
         }
     });
-    //this.checkEndGame();
 };
 gameSchema.methods.nextTurn = function() {
     this.turn = (this.turn + 1) % this.players.length;
     this.canMove = true;
-    return this.turn;
 };
 gameSchema.methods.checkEndGame = function() {
     let count = 0;

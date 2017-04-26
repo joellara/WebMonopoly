@@ -343,7 +343,7 @@ $(document).ready(function() {
                     } else {
                         $('#buyProperty').attr('disabled',true);
                     }
-                    $('#money').text(globalVars.players[myTurn].status.money);
+                    $('#money').text(data.game.players[myTurn].status.money);
                 }else if(data.game.status === "Finished"){
                     $('#startGame').attr('disabled',true);
                     $('#startGame').text('Juego empezado.');
@@ -374,15 +374,14 @@ $(document).ready(function() {
         }).done(function(data) {
             if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
                 globalVars = data.game;
+                data.game.players.forEach(function(player, index, players) {
+                    if (player.id === userId) {
+                        myTurn = index;
+                    }
+                });
                 if (data.game.status === "Started") {
-                    //Started or not
                     $('#startGame').attr('disabled',true);
                     $('#startGame').text('Juego empezado.');
-                    data.game.players.forEach(function(player, index, players) {
-                        if (player.id === userId) {
-                            myTurn = index;
-                        }
-                    });
                 } else if (data.game.status === "Finished") {
                     $('#startGame').attr('disabled',true);
                     $('#startGame').text('El juego ha terminado.');
@@ -446,7 +445,7 @@ $(document).ready(function() {
     });
 
     //make a move
-    socket.on('move', function(msg) {
+    socket.on('updateBoard', function(msg) {
         if (msg.gameId === gameId) {
             updateBoard();
         }

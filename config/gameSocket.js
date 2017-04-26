@@ -109,10 +109,10 @@ module.exports = function(io) {
                         }
                         game.save((err, game) => {
                             if (!err) {
-                                socket.broadcast.emit('move', {
+                                socket.broadcast.emit('updateBoard', {
                                     gameId: socket.gameId
                                 });
-                                socket.emit('move', {
+                                socket.emit('updateBoard', {
                                     gameId: socket.gameId
                                 });
                             }
@@ -130,10 +130,10 @@ module.exports = function(io) {
                     game.buyProperty();
                     game.nextTurn();
                     game.save((err)=>{
-                        socket.emit('move',{
+                        socket.emit('updateBoard',{
                             gameId:socket.gameId
                         });
-                        socket.broadcast.emit('move',{
+                        socket.broadcast.emit('updateBoard',{
                             gameId:socket.gameId
                         });
                     });

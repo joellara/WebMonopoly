@@ -468,7 +468,6 @@ $(document).ready(function() {
     });
     $('#buyProperty').click(function() {
         if (myTurn === globalVars.turn && globalVars.canMove === false) {
-            console.log('buy property client.');
             socket.emit('buyProperty');
         }
     });

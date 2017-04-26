@@ -74,15 +74,38 @@ module.exports = function(io) {
                                 player.status.position = newPosition;
                             }
                         });
-                        if (!game.propertyIsOwned() && game.players[game.turn].status.money > data[newPosition].price) {
-                            game.canMove = false;
-                        } else if (!game.propertyIsOwned() && game.players[game.turn].status.money < data[newPosition].price) {
+                        /*
+                            //1: Normal card
+                            //2: Station
+                            //3: Chance
+                            //4: Chest
+                            //5: Tax
+                            //6: Jail
+                            //7: Company
+                            //8: Go to Jail
+                            //9: Start
+                            //10: Free Parking
+                        */
+                        if(data[newPosition].type == 1 || data[newPosition].type == 7 || data[newPosition].type == 2){
+                            if (!game.propertyIsOwned() && game.players[game.turn].status.money > data[newPosition].price) {
+                                game.canMove = false;
+                            } else if (!game.propertyIsOwned() && game.players[game.turn].status.money < data[newPosition].price) {
+                                game.nextTurn();
+                            }
+                            if(game.propertyIsOwned()){
+                                game.pay();
+                                game.nextTurn();
+                            }
+                        }else if(data[newPosition].type == 3 || data[newPosition].type == 4){
                             game.nextTurn();
-                        }
-                        if(game.propertyIsOwned()){
+                        }else if(data[newPosition].type == 5){
                             game.pay();
                             game.nextTurn();
-                            game.canMove = true;
+                        }else if(data[newPosition].type == 8){
+                            game.players[game.turn].position = 10;
+                            game.nextTurn();
+                        }else{
+                            game.nextTurn();
                         }
                         game.save((err, game) => {
                             if (!err) {

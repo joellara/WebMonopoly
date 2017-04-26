@@ -322,23 +322,30 @@ $(document).ready(function() {
             type: 'GET'
         }).done(function(data) {
             if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
-                globalVars = data.game;
-                for (let i = 0; i < globalVars.players.length; i++) {
-                    $('#' + globalVars.players[i].id).remove();
-                    $('#' + globalVars.players[i].status.position).append('<img src="/img/tokens/cannon.svg" alt="User" class="abs" id="' + globalVars.players[i].id + '"/>');
-                    for (let j = 0; j < globalVars.players[i].status.properties.length; j++) {
-                        $('#' + globalVars.players[i].status.properties[j]).addClass('owned');
+                gameState = data.game;
+                if(typeof myTurn === "undefined" || myTurn !== null){
+                    data.game.players.forEach(function(player, index, players) {
+                        if (player.id === userId) {
+                            myTurn = index;
+                        }
+                    });
+                }
+                for (let i = 0; i < gameState.players.length; i++) {
+                    $('#' + gameState.players[i].id).remove();
+                    $('#' + gameState.players[i].status.position).append('<img src="/img/tokens/cannon.svg" alt="User" class="abs" id="' + gameState.players[i].id + '"/>');
+                    for (let j = 0; j < gameState.players[i].status.properties.length; j++) {
+                        $('#' + gameState.players[i].status.properties[j]).addClass('owned');
                     }
                 }
                 if (data.game.status === "Started") {
                     $('#startGame').attr('disabled',true);
                     $('#startGame').text('Juego empezado.');
-                    if (userId == globalVars.players[globalVars.turn].id && globalVars.canMove === true) {
+                    if (userId == gameState.players[gameState.turn].id && gameState.canMove === true) {
                         $('#rollDice').removeAttr('disabled');
                     } else {
                         $('#rollDice').attr('disabled',true);
                     }
-                    if (userId == globalVars.players[globalVars.turn].id && globalVars.canMove === false) {
+                    if (userId == gameState.players[gameState.turn].id && gameState.canMove === false) {
                         $('#buyProperty').removeAttr('disabled');
                     } else {
                         $('#buyProperty').attr('disabled',true);
@@ -354,18 +361,16 @@ $(document).ready(function() {
     }
     function updateUsers() {
         $('#usersList').empty();
-        if (typeof globalVars !== "undefined" && globalVars !== null) {
+        if (typeof gameState !== "undefined" && gameState !== null) {
             usersInGame.forEach(function(user, index, users) {
                 let classe = "";
-                if (user.id === globalVars.players[globalVars.turn].id) {
+                if (user.id === gameState.players[gameState.turn].id) {
                     classe +="active ";
                 }
                 $('#usersList').append('<li class="'+classe+' list-group-item">' + user.name + '</li>');
             });
         }
     }
-    let globalVars;
-
     function getInitialState() {
         //Check initial state
         $.ajax({
@@ -373,7 +378,7 @@ $(document).ready(function() {
             type: 'GET'
         }).done(function(data) {
             if (typeof data !== "undefined" && data !== null && data.valid === true && data.result === true) {
-                globalVars = data.game;
+                gameState = data.game;
                 data.game.players.forEach(function(player, index, players) {
                     if (player.id === userId) {
                         myTurn = index;
@@ -404,6 +409,7 @@ $(document).ready(function() {
     let userId = $('#userId').text();
     let userName = $('#userName').text();
     let myTurn;
+    let gameState;
     $('#gameBoard').empty().html(createBoard());
 
     socket.on('joinGame', function(msg) {
@@ -461,12 +467,12 @@ $(document).ready(function() {
         socket.emit('startGame');
     });
     $('#rollDice').click(function() {
-        if (myTurn === globalVars.turn && globalVars.canMove === true) {
+        if (myTurn === gameState.turn && gameState.canMove === true) {
             socket.emit('rollDice');
         }
     });
     $('#buyProperty').click(function() {
-        if (myTurn === globalVars.turn && globalVars.canMove === false) {
+        if (myTurn === gameState.turn && gameState.canMove === false) {
             socket.emit('buyProperty');
         }
     });

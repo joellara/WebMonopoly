@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 var data = require('../config/data.json').data;
 
 var gameSchema = mongoose.Schema({
@@ -49,7 +50,8 @@ var gameSchema = mongoose.Schema({
             properties: {
                 type: [Number],
                 default: []
-            }
+            },
+            color:String
         }
     }]
 });
@@ -96,7 +98,7 @@ gameSchema.methods.pay = function() {
         if (player.id !== playerId) {
             player.status.properties.forEach((property, index, properties) => {
                 if (property === cardId) {
-                    player.status.money += money;
+                    player.status.money += parseInt(price);
                 }
             });
         }

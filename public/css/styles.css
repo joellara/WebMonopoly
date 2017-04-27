@@ -48,10 +48,6 @@ body {
   position: absolute;
   top: 30%;
   left: 30%;
-  background-color:gray;
-}
-.owned{
-  background-color:gray;
 }
 
 .red {
@@ -59,4 +55,31 @@ body {
 }
 .white{
   color:white;
+}
+.margin-bottom{
+  margin-bottom: 20px;
+}
+img.Red{
+  background-color:red;
+}
+img.Green{
+  background-color:green;
+}
+img.Yellow{
+  background-color:yellow;
+}
+img.Blue{
+  background-color:blue;
+}
+.ownedRed{
+  background-color: red;
+}
+.ownedGreen{
+  background-color: green;
+}
+.ownedYellow{
+  background-color: yellow;
+}
+.ownedBlue{
+  background-color: blue;
 }

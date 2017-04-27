@@ -6,9 +6,7 @@ var data = require(path.join(__dirname, '../config/data.json')).data;
 module.exports = function(io) {
     let games = {}; //has users inside
     io.on('connection', function(socket) {
-        console.log('User connected.');
         socket.on('disconnect', function() {
-            console.log('User disconnected');
             socket.broadcast.emit('leaveGame', {
                 gameId: socket.gameId,
                 userId: socket.userId
@@ -43,11 +41,6 @@ module.exports = function(io) {
                         name: msg.userName
                     });
                 }
-                socket.emit('joinGame', {
-                    gameId: msg.gameId,
-                    users: games[msg.gameId]
-                });
-
                 socket.broadcast.emit('newUser', {
                     gameId: msg.gameId,
                     user: {
@@ -55,8 +48,11 @@ module.exports = function(io) {
                         name: msg.userName
                     }
                 });
-                console.log('Usuarios adentro:', games[msg.gameId]);
             }
+            socket.emit('joinGame', {
+                gameId: msg.gameId,
+                users: games[msg.gameId]
+            });
         });
 
         socket.on('rollDice', function(msg) {
@@ -74,18 +70,6 @@ module.exports = function(io) {
                                 player.status.position = newPosition;
                             }
                         });
-                        /*
-                            //1: Normal card
-                            //2: Station
-                            //3: Chance
-                            //4: Chest
-                            //5: Tax
-                            //6: Jail
-                            //7: Company
-                            //8: Go to Jail
-                            //9: Start
-                            //10: Free Parking
-                        */
                        let newLocationCard = data[newPosition];
                         if(newLocationCard.type == 1 || newLocationCard.type == 7 || newLocationCard.type == 2){
                             if (!game.propertyIsOwned() && game.players[game.turn].status.money > newLocationCard.price) {
@@ -113,8 +97,9 @@ module.exports = function(io) {
                                 socket.broadcast.emit('updateBoard', {
                                     gameId: socket.gameId
                                 });
-                                socket.emit('updateBoard', {
-                                    gameId: socket.gameId
+                                socket.emit('moved', {
+                                    gameId: socket.gameId,
+                                    position: dice1 + dice2
                                 });
                             }
                         });
@@ -129,6 +114,24 @@ module.exports = function(io) {
             }, (err, game) => {
                 if (!err) {
                     game.buyProperty();
+                    game.nextTurn();
+                    game.save((err)=>{
+                        socket.emit('updateBoard',{
+                            gameId:socket.gameId
+                        });
+                        socket.broadcast.emit('updateBoard',{
+                            gameId:socket.gameId
+                        });
+                    });
+                }
+            });
+        });
+        socket.on('skipTurn', function() {
+            Game.findOne({
+                'players.id': socket.userId,
+                _id: socket.gameId
+            }, (err, game) => {
+                if (!err) {
                     game.nextTurn();
                     game.save((err)=>{
                         socket.emit('updateBoard',{

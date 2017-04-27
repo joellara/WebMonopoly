@@ -4,7 +4,7 @@ var express = require('express');
 var path = require('path');
 var router = express.Router();
 var Game = require(path.join(__dirname, '../models/Game.js'));
-
+let dataColor = ["Red","Blue","Yellow","Green"];
 router.all('*', function(req, res, next) {
     if (typeof req.session.user_id === "undefined" || req.session.user_id === undefined || req.session.user_id === null || req.session.user_id === '') {
         req.session.redirect = req.originalUrl;
@@ -132,7 +132,7 @@ router.delete('/:id', (req, res, nest) => {
 
 //Create new game
 router.post('/', (req, res, next) => {
-    var players = [{ id: req.session.user_id }];
+    var players = [{ id: req.session.user_id,status:{color:dataColor[0]}}];
     var newGame = new Game({ name: req.body.name, players: players });
     if (typeof newGame !== "undefined" && newGame !== "") {
         newGame.save(function(err, game) {
@@ -189,7 +189,7 @@ router.put('/:id', (req, res, next) => {
                         }
                     });
                     if (!found) {
-                        game.players.push({ id: req.session.user_id });
+                        game.players.push({ id: req.session.user_id ,status:{color:dataColor[game.players.length]}});
                         game.save((err, game) => {
                             if (err) res.json({
                                 valid: false,

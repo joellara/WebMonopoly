@@ -332,9 +332,9 @@ $(document).ready(function() {
                 }
                 for (let i = 0; i < gameState.players.length; i++) {
                     $('#' + gameState.players[i].id).remove();
-                    $('#' + gameState.players[i].status.position).append('<img src="/img/tokens/cannon.svg" alt="User" class="abs" id="' + gameState.players[i].id + '"/>');
+                    $('#' + gameState.players[i].status.position).append('<img src="/img/tokens/cannon.svg" alt="User" class="abs '+gameState.players[i].status.color+'" id="' + gameState.players[i].id + '"/>');
                     for (let j = 0; j < gameState.players[i].status.properties.length; j++) {
-                        $('#' + gameState.players[i].status.properties[j]).addClass('owned');
+                        $('#' + gameState.players[i].status.properties[j]).addClass('owned'+gameState.players[i].status.color);
                     }
                 }
                 if (data.game.status === "Started") {
@@ -347,8 +347,10 @@ $(document).ready(function() {
                     }
                     if (userId == gameState.players[gameState.turn].id && gameState.canMove === false) {
                         $('#buyProperty').removeAttr('disabled');
+                        $('#skipTurn').removeAttr('disabled');
                     } else {
                         $('#buyProperty').attr('disabled',true);
+                        $('#skipTurn').attr('disabled',true);
                     }
                     $('#money').text(data.game.players[myTurn].status.money);
                 }else if(data.game.status === "Finished"){
@@ -413,7 +415,6 @@ $(document).ready(function() {
     $('#gameBoard').empty().html(createBoard());
 
     socket.on('joinGame', function(msg) {
-        console.log('joinGame');
         if (msg.gameId === gameId) {
             msg.users.forEach(function(user, index, users) {
                 usersInGame.push({
@@ -425,7 +426,6 @@ $(document).ready(function() {
         }
     });
     socket.on('newUser', function(msg) {
-        console.log('newUser');
         if (msg.gameId === gameId) {
             usersInGame.push(msg.user);
             updateBoard();
@@ -447,6 +447,12 @@ $(document).ready(function() {
             });
             usersInGame.splice(indexO, 1);
             updateBoard();
+        }
+    });
+    socket.on('moved', function(msg) {
+        if (msg.gameId === gameId) {
+            updateBoard();
+            $('#diceResult').text('Te has movido: '+msg.position+' posiciones.');
         }
     });
 
@@ -474,6 +480,12 @@ $(document).ready(function() {
     $('#buyProperty').click(function() {
         if (myTurn === gameState.turn && gameState.canMove === false) {
             socket.emit('buyProperty');
+        }
+    });
+    $('#skipTurn').click(function() {
+        if (myTurn === gameState.turn && gameState.canMove === false) {
+            socket.emit('skipTurn');
+            $('#diceResult').text('');
         }
     });
 });

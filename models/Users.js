@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 var userSchema = mongoose.Schema({
     id: mongoose.Schema.Types.ObjectId,

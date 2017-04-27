@@ -74,17 +74,26 @@ module.exports = function(io) {
                         if(newLocationCard.type == 1 || newLocationCard.type == 7 || newLocationCard.type == 2){
                             if (!game.propertyIsOwned() && game.players[game.turn].status.money > newLocationCard.price) {
                                 game.canMove = false;
+                                socket.emit('notification',{
+                                    msg:'Puedes comprar la propiedad'
+                                });
                             } else if (!game.propertyIsOwned() && game.players[game.turn].status.money < newLocationCard.price) {
                                 game.nextTurn();
                             }
                             if(game.propertyIsOwned()){
                                 game.pay();
+                                socket.emit('notification',{
+                                    msg:'Pagas o hay tabla..'
+                                });
                                 game.nextTurn();
                             }
                         }else if(newLocationCard.type == 3 || newLocationCard.type == 4){
                             game.nextTurn();
                         }else if(newLocationCard.type == 5){
                             game.pay();
+                            socket.emit('notification',{
+                                msg:'Ya llegó hacienda, prro.'
+                            });
                             game.nextTurn();
                         }else if(newLocationCard.type == 8){
                             game.players[game.turn].position = 10;

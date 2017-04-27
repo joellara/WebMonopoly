@@ -414,6 +414,10 @@ $(document).ready(function() {
     let gameState;
     $('#gameBoard').empty().html(createBoard());
 
+    socket.on('notification',function(msg){
+        $('#notification').text(msg.msg);
+        $('#diceResult').text('');
+    });
     socket.on('joinGame', function(msg) {
         if (msg.gameId === gameId) {
             msg.users.forEach(function(user, index, users) {
@@ -480,6 +484,7 @@ $(document).ready(function() {
     $('#buyProperty').click(function() {
         if (myTurn === gameState.turn && gameState.canMove === false) {
             socket.emit('buyProperty');
+            $('#diceResult').text('');
         }
     });
     $('#skipTurn').click(function() {

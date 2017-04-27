@@ -354,8 +354,13 @@ $(document).ready(function() {
                     }
                     $('#money').text(data.game.players[myTurn].status.money);
                 }else if(data.game.status === "Finished"){
+                    $('#money').text(data.game.players[myTurn].status.money);
                     $('#startGame').attr('disabled',true);
+                    $('#buyProperty').attr('disabled',true);
+                    $('#skipTurn').attr('disabled',true);
                     $('#startGame').text('Juego empezado.');
+                    $('#rollDice').attr('disabled',true);
+                    $('#startGame').text('Juego ha terminado.');
                 }
                 updateUsers();
             }

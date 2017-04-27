@@ -103,6 +103,7 @@ gameSchema.methods.pay = function() {
             });
         }
     });
+    this.checkEndGame();
 };
 gameSchema.methods.nextTurn = function() {
     this.turn = (this.turn + 1) % this.players.length;
@@ -110,16 +111,17 @@ gameSchema.methods.nextTurn = function() {
 };
 gameSchema.methods.checkEndGame = function() {
     let count = 0;
+    let playerId;
     this.players.forEach((player, index, players) => {
         if (player.status.money < 0) {
             count++;
+        }else{
+            playerId = player.id;
         }
     });
     if (count == this.players.length - 1) {
         this.status = "Finished";
-        return true;
-    } else {
-        return false;
+        this.winner = playerId;
     }
 };
 gameSchema.methods.move = function(playerId, count) {

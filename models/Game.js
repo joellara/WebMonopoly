@@ -106,7 +106,11 @@ gameSchema.methods.pay = function() {
     this.checkEndGame();
 };
 gameSchema.methods.nextTurn = function() {
+    let prev = this.turn;
     this.turn = (this.turn + 1) % this.players.length;
+    if(prev < this.turn){
+        this.players[this.turn].money += 200;
+    }
     this.canMove = true;
 };
 gameSchema.methods.checkEndGame = function() {

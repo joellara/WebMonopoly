@@ -361,6 +361,11 @@ $(document).ready(function() {
                     $('#startGame').text('Juego empezado.');
                     $('#rollDice').attr('disabled',true);
                     $('#startGame').text('Juego ha terminado.');
+                    usersInGame.forEach(function(user, index, users) {
+                        if(user.id === data.game.winner){
+                            $('#winner').text(user.name);
+                        }
+                    });
                 }
                 updateUsers();
             }

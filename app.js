@@ -81,7 +81,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/web_monopoly');
 mongoose.connection.on('open', () => {
     console.log('Connected to MongoDB');
 
-    httpServ.listen(process.env.port || 80, function() {
+    httpServ.listen(process.env.PORT || 80, function() {
         let port = httpServ.address().port;
         console.log("Unsecure app now running on port", port);
     });

@@ -86,24 +86,36 @@ gameSchema.methods.pay = function() {
     let playerId = this.players[this.turn].id;
     let price = data[this.players[this.turn].status.position].price;
     let cardId = this.players[this.turn].status.position;
+    let mine = false;
     this.players.forEach((player, index, players) => {
-        if (player.id == playerId) {
-            money = player.status.money;
-            player.status.money -= price;
-            if (player.status.money < 0) {
-                player.status.state = "Lost";
-            }
-        }
-    });
-    this.players.forEach((player, index, players) => {
-        if (player.id !== playerId) {
+        if (player.id === playerId) {
             player.status.properties.forEach((property, index, properties) => {
                 if (property === cardId) {
-                    player.status.money += parseInt(price);
+                    mine = true;
                 }
             });
         }
     });
+    if(!mine){
+        this.players.forEach((player, index, players) => {
+            if (player.id == playerId) {
+                money = player.status.money;
+                player.status.money -= price;
+                if (player.status.money < 0) {
+                    player.status.state = "Lost";
+                }
+            }
+        });
+        this.players.forEach((player, index, players) => {
+            if (player.id !== playerId) {
+                player.status.properties.forEach((property, index, properties) => {
+                    if (property === cardId) {
+                        player.status.money += parseInt(price);
+                    }
+                });
+            }
+        });
+    }
     this.checkEndGame();
 };
 gameSchema.methods.nextTurn = function() {

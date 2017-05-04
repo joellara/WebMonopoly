@@ -87,8 +87,14 @@ module.exports = function(io) {
                                 });
                                 game.nextTurn();
                             }
-                        }else if(newLocationCard.type == 3 || newLocationCard.type == 4){
+                        }else if(newLocationCard.type == 3){
                             game.nextTurn();
+                        }else if(newLocationCard.type == 4){
+                            game.nextTurn();
+                            game.players[game.turn].status.money += _.random(1,200);
+                            socket.emit('notification',{
+                                msg:'Ya llegó el aguinaldo.'
+                            });
                         }else if(newLocationCard.type == 5){
                             game.pay();
                             socket.emit('notification',{
@@ -96,7 +102,7 @@ module.exports = function(io) {
                             });
                             game.nextTurn();
                         }else if(newLocationCard.type == 8){
-                            game.players[game.turn].position = 10;
+                            game.players[game.turn].status.position = 10;
                             game.nextTurn();
                         }else{
                             game.nextTurn();

@@ -88,13 +88,26 @@ module.exports = function(io) {
                                 game.nextTurn();
                             }
                         }else if(newLocationCard.type == 3){
+                            let leMoney = _.random(0,200);
+                            let sumOrMinus = _.random(0,100);
+                            if(sumOrMinus % 2 == 0){
+                                game.players[game.turn].status.money += parseInt(leMoney);
+                                socket.emit('notification',{
+                                    msg:'Gracias Cthulhu por le money!.'
+                                });
+                            }else{
+                                game.players[game.turn].status.money -= parseInt(leMoney);
+                                socket.emit('notification',{
+                                    msg:'Esta suerte del demonio.'
+                                });
+                            }
                             game.nextTurn();
                         }else if(newLocationCard.type == 4){
-                            game.nextTurn();
                             game.players[game.turn].status.money += parseInt(_.random(1,200));
                             socket.emit('notification',{
                                 msg:'Ya llegó el aguinaldo.'
                             });
+                            game.nextTurn();
                         }else if(newLocationCard.type == 5){
                             game.pay();
                             socket.emit('notification',{

@@ -132,8 +132,11 @@ gameSchema.methods.move = function(playerId, count) {
     let position;
     this.players.forEach((player, index, players) => {
         if (player.id.toString() === playerId && index === this.turn) {
-            player.status.position = (player.status.position + count) % (data.length - 1);
             position = player.status.position;
+            player.status.position = (player.status.position + count) % (data.length - 1);
+            if(player.status.position < position){
+                player.status.money += parseInt(price);
+            }
         }
     });
     this.canMove = false;

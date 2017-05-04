@@ -91,7 +91,7 @@ module.exports = function(io) {
                             game.nextTurn();
                         }else if(newLocationCard.type == 4){
                             game.nextTurn();
-                            game.players[game.turn].status.money += _.random(1,200);
+                            game.players[game.turn].status.money += parseInt(_.random(1,200));
                             socket.emit('notification',{
                                 msg:'Ya llegó el aguinaldo.'
                             });
@@ -102,7 +102,10 @@ module.exports = function(io) {
                             });
                             game.nextTurn();
                         }else if(newLocationCard.type == 8){
-                            game.players[game.turn].status.position = 10;
+                            game.players[game.turn].status.position = parseInt(10);
+                            socket.emit('notification',{
+                                msg:'Ya te cayo la migra.'
+                            });
                             game.nextTurn();
                         }else{
                             game.nextTurn();

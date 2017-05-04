@@ -109,9 +109,6 @@ gameSchema.methods.pay = function() {
 gameSchema.methods.nextTurn = function() {
     let prev = this.turn;
     this.turn = (this.turn + 1) % this.players.length;
-    if(prev < this.turn){
-        this.players[this.turn].status.money += 200;
-    }
     this.canMove = true;
 };
 gameSchema.methods.checkEndGame = function() {
@@ -133,7 +130,11 @@ gameSchema.methods.move = function(playerId, count) {
     let position;
     this.players.forEach((player, index, players) => {
         if (player.id.toString() === playerId && index === this.turn) {
+            position = player.status.position;
             player.status.position = (player.status.position + count) % (data.length - 1);
+            if(player.status.position < position){
+                player.status.money += parseInt(200);
+            }
             position = player.status.position;
         }
     });

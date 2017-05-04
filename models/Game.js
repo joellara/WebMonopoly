@@ -1,3 +1,4 @@
+'use strict';
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 var data = require('../config/data.json').data;
@@ -74,7 +75,7 @@ gameSchema.methods.buyProperty = function() {
     this.players.forEach((player, index, players) => {
         if (player.id === playerId) {
             if (player.status.money >= price) {
-                player.status.money -= price;
+                player.status.money -= parseInt(price);
                 player.status.properties.push(cardId);
             }
         }
@@ -109,7 +110,7 @@ gameSchema.methods.nextTurn = function() {
     let prev = this.turn;
     this.turn = (this.turn + 1) % this.players.length;
     if(prev < this.turn){
-        this.players[this.turn].money += 200;
+        this.players[this.turn].status.money += 200;
     }
     this.canMove = true;
 };
@@ -132,11 +133,8 @@ gameSchema.methods.move = function(playerId, count) {
     let position;
     this.players.forEach((player, index, players) => {
         if (player.id.toString() === playerId && index === this.turn) {
-            position = player.status.position;
             player.status.position = (player.status.position + count) % (data.length - 1);
-            if(player.status.position < position){
-                player.status.money += parseInt(price);
-            }
+            position = player.status.position;
         }
     });
     this.canMove = false;
